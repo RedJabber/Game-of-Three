@@ -2,6 +2,8 @@ package com.takeaway.demo.gameofthree.services;
 
 import com.takeaway.demo.gameofthree.entities.Party;
 import com.takeaway.demo.gameofthree.entities.Player;
+import com.takeaway.demo.gameofthree.exceptions.PartyException;
+import com.takeaway.demo.gameofthree.exceptions.PartyNotFoundException;
 import com.takeaway.demo.gameofthree.mappers.PartyMapper;
 import com.takeaway.demo.gameofthree.models.PartyInfo;
 import com.takeaway.demo.gameofthree.models.PlayerMove;
@@ -10,7 +12,6 @@ import com.takeaway.demo.gameofthree.repositories.PlayerRepository;
 
 
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 
 import javax.transaction.Transactional;
 
@@ -67,7 +68,7 @@ public class PartyServiceImpl implements PartyService {
 
     private Party getPartyChecked(String partyId) {
         return parties.findById(partyId)
-                .orElseThrow(() -> new NotFoundException("error.party.is.not.found." + partyId));
+                .orElseThrow(() -> new PartyNotFoundException("error.party.is.not.found", partyId));
     }
 
     @Override
@@ -75,7 +76,7 @@ public class PartyServiceImpl implements PartyService {
         var party = getPartyChecked(partyId);
         var player =
                 players.findById(turn.getPlayerId())
-                        .orElseThrow(() -> new NotFoundException("error.player.is.not.found." + turn.getPlayerId()));
+                        .orElseThrow(() -> new PartyException("error.player.is.not.found", turn.getPlayerId()));
         party.makeMove(player, turn.getAddition());
         return partyMapper.toDto(parties.save(party));
     }

@@ -92,13 +92,13 @@ public class Party {
         checkIsStarted();
         int currentValue = getCurrentValue();
         if ((currentValue + addition) % 3 != 0) {
-            throw new PartyException("error.turn.addition.is.incorrect");
+            throw new PartyException("error.turn.addition.is.incorrect", addition, currentValue);
         }
         if (addition < -1 || addition > 1) {
             throw new PartyException("error.turn.addition.is.not.in.range", addition);
         }
         if (!currentPlayer.equals(player)) {
-            throw new PartyException("error.party.player.step.out.of.order");
+            throw new PartyException("error.party.player.step.out.of.order", player.getNickName());
         }
         turns.add(new Turn()
                 .setAddition(addition)
@@ -112,13 +112,13 @@ public class Party {
 
     private void checkIsNotStarted() {
         if (isStarted()) {
-            throw new PartyException("error.party.is.not.started.yet." + id);
+            throw new PartyException("error.party.is.not.started.yet", id);
         }
     }
 
     private void checkIsStarted() {
         if (!isStarted()) {
-            throw new PartyException("error.party.is.already.started." + id);
+            throw new PartyException("error.party.is.already.started", id);
         }
     }
 
@@ -131,7 +131,7 @@ public class Party {
     public void join(Player player) {
         checkIsNotStarted();
         if (players.stream().map(PartyMember::getPlayer).anyMatch(player::equals)) {
-            throw new PartyException("error.no.party.self.play." + player.getNickName());
+            throw new PartyException("error.no.party.self.play", player.getNickName());
         }
         if (players.size() >= 2) {
             throw new PartyException("error.party.have.enough.players");

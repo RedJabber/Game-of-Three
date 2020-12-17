@@ -1,4 +1,4 @@
-package com.takeaway.demo.gameofthree.endpoiunts;
+package com.takeaway.demo.gameofthree.endpoints;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -86,7 +86,7 @@ class PartyControllerTest {
         var response = restJoinParty(partyId, player1Id, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).isEqualTo("error.no.party.self.play." + player1Id);
+        assertThat(response.getBody()).isNotBlank();
     }
 
 
@@ -183,7 +183,7 @@ class PartyControllerTest {
         var party = step1Response.getBody();
         var turnsCount = 1;
 
-        int iterationsLimit = toIntExact(round(log(party.getCurrentValue()) / log(3))) + 1;
+        int iterationsLimit = toIntExact(round(log(stepValues[0]) / log(3))) + 1;
         while (!party.isOver()) {
             assertThat(party.getCurrentPlayerId())
                     .isEqualTo(players[(turnsCount + 1) % 2]);

@@ -1,7 +1,10 @@
-package com.takeaway.demo.gameofthree.endpoiunts;
+package com.takeaway.demo.gameofthree.endpoints;
 
+import com.takeaway.demo.gameofthree.exceptions.PartyException;
+import com.takeaway.demo.gameofthree.exceptions.PartyNotFoundException;
 import com.takeaway.demo.gameofthree.models.PartyInfo;
 import com.takeaway.demo.gameofthree.models.PlayerMove;
+import com.takeaway.demo.gameofthree.services.LocalizationService;
 import com.takeaway.demo.gameofthree.services.PartyService;
 
 
@@ -34,9 +37,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/parties")
 public class PartyController {
 
+    private final LocalizationService localizationService;
     private final PartyService partyService;
 
-    public PartyController(PartyService partyService) {this.partyService = partyService;}
+    public PartyController(LocalizationService localizationService, PartyService partyService) {
+        this.localizationService = localizationService;
+        this.partyService = partyService;}
 
     @Operation(description = "Creates new party ",
                parameters = @Parameter(name = "nickName", description = "game starter nickname", required = true),
@@ -74,10 +80,22 @@ public class PartyController {
         return partyService.makeManualMove(partyId, turn);
     }
 
+    @ExceptionHandler(PartyNotFoundException.class)
+    ResponseEntity<String> handleNotFoundParty(PartyNotFoundException e) {
+        log.error(e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(localizationService.getMessage(e.getMessage(), e.getMessageParams()));
+    }
+
+    @ExceptionHandler(PartyException.class)
+    ResponseEntity<String> handlePartyException(PartyException e) {
+        log.error(e.getMessage(), e);
+        return ResponseEntity.badRequest().body(localizationService.getMessage(e.getMessage(), e.getMessageParams()));
+    }
+
     @ExceptionHandler(RuntimeException.class)
     ResponseEntity<String> handle(RuntimeException e) {
         log.error(e.getMessage(), e);
-        return ResponseEntity.badRequest().body(e.getMessage());
+        return ResponseEntity.badRequest().body(localizationService.getMessage(e.getMessage(), e));
     }
 
 }
