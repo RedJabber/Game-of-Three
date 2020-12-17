@@ -2,7 +2,6 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
-priceaggregator:
-  durationInSeconds: 60
-  recalculationSchedule: 0/1 * * * * ?
+game:
+  topNumber: 65536
 
